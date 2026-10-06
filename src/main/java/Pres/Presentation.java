@@ -1,18 +1,31 @@
 package Pres;
 
-import IDao.DaoImpl;
-import metier.MetierImpl;
+import IDao.IDao;
+import metier.IMetier;
 
 public class Presentation {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-        DaoImpl dao = new DaoImpl();
+        // Chargement dynamique de la classe DaoImpl
+        Class<?> daoClass = Class.forName("IDao.DaoImpl");
 
-        MetierImpl metier = new MetierImpl();
+        // Création dynamique de l'objet Dao
+        IDao dao = (IDao) daoClass.getDeclaredConstructor().newInstance();
 
-        metier.setDao(dao);
+        // Chargement dynamique de la classe MetierImpl
+        Class<?> metierClass = Class.forName("metier.MetierImpl");
 
+        // Création dynamique de l'objet Metier
+        IMetier metier =
+                (IMetier) metierClass.getDeclaredConstructor().newInstance();
+
+        // Injection dynamique de Dao dans Metier
+        metierClass
+                .getMethod("setDao", IDao.class)
+                .invoke(metier, dao);
+
+        // Calcul
         System.out.println("Résultat = " + metier.calcul());
     }
 }
